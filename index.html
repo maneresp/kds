@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خدمة الرشق</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #3f51b5;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        label {
+            font-size: 16px;
+            color: #333;
+            text-align: right;
+        }
+        select, input, button {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        select, input {
+            background-color: #f9f9f9;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #3f51b5;
+            background-color: #ffffff;
+        }
+        button {
+            background-color: #3f51b5;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #303f9f;
+        }
+        .response {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            color: #388e3c;
+            border: 1px solid #81c784;
+            border-radius: 8px;
+            font-size: 16px;
+            display: inline-block;
+        }
+        .form-control {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>خدمة الرشق</h1>
+        <form id="form">
+            <div class="form-control">
+                <label for="service">اختر الخدمة:</label>
+                <select id="service" name="service" required>
+                    <option value="مشاهدات تلي">مشاهدات تلي</option>
+                    <option value="تفاعلات تلي">تفاعلات تلي</option>
+                </select>
+            </div>
+            <div class="form-control">
+                <label for="link">أدخل الرابط:</label>
+                <input type="text" id="link" name="link" placeholder="ضع الرابط هنا" required>
+            </div>
+            <div class="form-control">
+                <label for="quantity">أدخل العدد (الحد الأدنى 50):</label>
+                <input type="number" id="quantity" name="quantity" min="50" required>
+            </div>
+            <button type="submit">رشق</button>
+        </form>
+        <div id="response" class="response" style="display:none;"></div>
+    </div>
+
+    <script>
+        const API_URL = "https://kd1s.com/api/v2";
+        const API_KEY = "3c9131404ee3ecd075fa77c149268b16";
+
+        const form = document.getElementById("form");
+        const responseDiv = document.getElementById("response");
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();  // منع إعادة تحميل الصفحة
+
+            const service = document.getElementById("service").value;
+            const link = document.getElementById("link").value;
+            const quantity = parseInt(document.getElementById("quantity").value);
+
+            if (quantity < 50) {
+                alert("العدد الأدنى هو 50");
+                return;
+            }
+
+            const serviceIds = {
+                "مشاهدات تلي": 9183,
+                "تفاعلات تلي": 12795
+            };
+
+            const data = {
+                'key': API_KEY,
+                'action': 'add',
+                'service': serviceIds[service],
+                'link': link,
+                'quantity': quantity
+            };
+
+            fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams(data).toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                responseDiv.style.display = "block";
+                responseDiv.textContent = `الاستجابة: ${JSON.stringify(data)}`;
+            })
+            .catch(error => {
+                responseDiv.style.display = "block";
+                responseDiv.textContent = `حدث خطأ: ${error.message}`;
+            });
+        });
+    </script>
+</body>
+  </html>
